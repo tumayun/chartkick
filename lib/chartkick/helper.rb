@@ -29,16 +29,21 @@ module Chartkick
     def chartkick_chart(klass, data_source, options, &block)
       @chartkick_chart_id ||= 0
       options = options.dup
-      element_id = options.delete(:id) || "chart-#{@chartkick_chart_id += 1}"
       height = options.delete(:height) || "300px"
       # content_for: nil must override default
       content_for = options.has_key?(:content_for) ? options.delete(:content_for) : Chartkick.content_for
 
-      html = <<HTML
+      if (element_id = options.delete(:id)).blank?
+        element_id = "chart-#{@chartkick_chart_id += 1}"
+        html = <<HTML
 <div id="#{ERB::Util.html_escape(element_id)}" style="height: #{ERB::Util.html_escape(height)}; text-align: center; color: #999; line-height: #{ERB::Util.html_escape(height)}; font-size: 14px; font-family: 'Lucida Grande', 'Lucida Sans Unicode', Verdana, Arial, Helvetica, sans-serif;">
   Loading...
 </div>
 HTML
+      else
+        html = ''
+      end
+
      js = <<JS
 <script type="text/javascript">
   new Chartkick.#{klass}(#{element_id.to_json}, #{data_source.to_json}, #{options.to_json});
